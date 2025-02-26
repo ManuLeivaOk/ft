@@ -48,8 +48,6 @@ body {
   background-color: var(--bg);
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -106,8 +104,6 @@ body {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -115,4 +111,34 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(4rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(4rem);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+.animate-fadeOut {
+  animation: fadeOut 1s ease-in-out 1s 4s forwards; /* Espera 4 segundos antes de ejecutar fadeOut */
 }

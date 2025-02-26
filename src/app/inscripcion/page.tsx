@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -8,12 +9,21 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import ErrorDialog from "../../components/ui/errorDialog";
+
+type FormData = {
+  name: string;
+  lastName: string;
+  email: string;
+  age: number;
+  school: string;
+  course: string;
+};
 
 const schema = yup.object().shape({
   name: yup.string().required("El nombre es obligatorio"),
@@ -41,19 +51,43 @@ const Page = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: any) => {
+  const [errorsList, setErrorsList] = useState<string[]>([]);
+
+  const onSubmit = (data: FormData) => {
     console.log("Datos enviados:", data);
+  };
+
+  const handleErrors = () => {
+    const firstErrorMessage = Object.values(errors)
+      .map((error) => error.message)
+      .find((message): message is string => message !== undefined); // Tomar solo el primer error
+  
+    if (firstErrorMessage) {
+      setErrorsList([firstErrorMessage]);
+  
+      // Auto ocultar después de 5 segundos
+      setTimeout(() => {
+        setErrorsList([]);
+      }, 5000);
+    }
   };
 
   return (
     <div className="w-full h-screen flex justify-center items-center">
+      {errorsList.length > 0 && (
+        <ErrorDialog
+          message={errorsList.join(" • ")}
+          onClose={() => setErrorsList([])}
+          color="bg-[#ff6b6b]"
+        />
+      )}
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>Formulario de registro</CardTitle>
           <CardDescription>Registro de alumnos.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit, handleErrors)}>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Nombre</Label>
@@ -63,9 +97,6 @@ const Page = () => {
                   type="text"
                   {...register("name")}
                 />
-                {errors.name && (
-                  <p className="text-red-500 text-sm">{errors.name.message}</p>
-                )}
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="lastName">Apellido</Label>
@@ -75,11 +106,6 @@ const Page = () => {
                   type="text"
                   {...register("lastName")}
                 />
-                {errors.lastName && (
-                  <p className="text-red-500 text-sm">
-                    {errors.lastName.message}
-                  </p>
-                )}
               </div>
 
               <div className="flex flex-col space-y-1.5">
@@ -90,9 +116,6 @@ const Page = () => {
                   type="email"
                   {...register("email")}
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-sm">{errors.email.message}</p>
-                )}
               </div>
 
               <div className="flex flex-col space-y-1.5">
@@ -103,9 +126,6 @@ const Page = () => {
                   type="number"
                   {...register("age")}
                 />
-                {errors.age && (
-                  <p className="text-red-500 text-sm">{errors.age.message}</p>
-                )}
               </div>
 
               <div className="flex flex-col space-y-1.5">
@@ -115,30 +135,20 @@ const Page = () => {
                   placeholder="General José María Paz"
                   {...register("school")}
                 />
-                {errors.school && (
-                  <p className="text-red-500 text-sm">
-                    {errors.school.message}
-                  </p>
-                )}
               </div>
 
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="course">Curso y división</Label>
                 <Input id="course" placeholder="6 C" {...register("course")} />
-                {errors.course && (
-                  <p className="text-red-500 text-sm">
-                    {errors.course.message}
-                  </p>
-                )}
               </div>
+            </div>
+            <div className="w-full justify-center mt-10">
+              <Button type="submit" variant="neutral">
+                Registrarse
+              </Button>
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button type="submit" variant="neutral">
-            Registrarse
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
