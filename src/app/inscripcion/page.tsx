@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useRouter } from "next/navigation";
 
 import { Button } from "../../components/ui/button";
 import {
@@ -15,6 +16,8 @@ import {
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import ErrorDialog from "../../components/ui/errorDialog";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 type FormData = {
   name: string;
@@ -42,7 +45,9 @@ const schema = yup.object().shape({
   course: yup.string().required("El curso y división son obligatorios"),
 });
 
-const Page = () => {
+const Page = () => {  
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -50,21 +55,22 @@ const Page = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
-
+  const [step, setStep] = useState(1);
   const [errorsList, setErrorsList] = useState<string[]>([]);
 
   const onSubmit = (data: FormData) => {
     console.log("Datos enviados:", data);
+    router.push("/login");
   };
 
   const handleErrors = () => {
     const firstErrorMessage = Object.values(errors)
       .map((error) => error.message)
       .find((message): message is string => message !== undefined); // Tomar solo el primer error
-  
+
     if (firstErrorMessage) {
       setErrorsList([firstErrorMessage]);
-  
+
       // Auto ocultar después de 5 segundos
       setTimeout(() => {
         setErrorsList([]);
@@ -81,75 +87,94 @@ const Page = () => {
           color="bg-[#ff6b6b]"
         />
       )}
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Formulario de registro</CardTitle>
-          <CardDescription>Registro de alumnos.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit, handleErrors)}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Nombre</Label>
-                <Input
-                  id="name"
-                  placeholder="Juan"
-                  type="text"
-                  {...register("name")}
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="lastName">Apellido</Label>
-                <Input
-                  id="lastName"
-                  placeholder="Perez"
-                  type="text"
-                  {...register("lastName")}
-                />
-              </div>
+      {step === 1 ? (
+        <div className="px-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Hola, ¡bienvenido! </h2>
+          <Image alt="Hello!" src="/bienvenida.jpg" width={300} height={200} className="mx-auto rounded-xl mb-4 shadow w-full opacity-95" />
+          <p className="mb-4">
+            Para poder registrarte, por favor completa el siguiente formulario
+          </p>
+          <Button className="mb-10" onClick={() => setStep(2)}>Comenzar</Button>
 
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  placeholder="juan.perez@email.com"
-                  type="email"
-                  {...register("email")}
-                />
-              </div>
+          <p className="mb-4">
+            Si ya tenés una cuenta, podés <Badge className="mb-2" onClick={() => {router.push('/login')}}>iniciar sesión</Badge>
+          </p>
+        </div>
+      ) : (
+        <Card className="w-[350px]">
+          <CardHeader>
+            <CardTitle>Formulario de registro</CardTitle>
+            <CardDescription>Registro de alumnos.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit, handleErrors)}>
+              <div className="grid w-full items-center gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="name">Nombre</Label>
+                  <Input
+                    id="name"
+                    placeholder="Juan"
+                    type="text"
+                    {...register("name")}
+                  />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="lastName">Apellido</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Perez"
+                    type="text"
+                    {...register("lastName")}
+                  />
+                </div>
 
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="age">Edad</Label>
-                <Input
-                  id="age"
-                  placeholder="17"
-                  type="number"
-                  {...register("age")}
-                />
-              </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    placeholder="juan.perez@email.com"
+                    type="email"
+                    {...register("email")}
+                  />
+                </div>
 
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="school">Colegio</Label>
-                <Input
-                  id="school"
-                  placeholder="General José María Paz"
-                  {...register("school")}
-                />
-              </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="age">Edad</Label>
+                  <Input
+                    id="age"
+                    placeholder="17"
+                    type="number"
+                    {...register("age")}
+                  />
+                </div>
 
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="course">Curso y división</Label>
-                <Input id="course" placeholder="6 C" {...register("course")} />
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="school">Colegio</Label>
+                  <Input
+                    id="school"
+                    placeholder="General José María Paz"
+                    {...register("school")}
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="course">Curso y división</Label>
+                  <Input
+                    id="course"
+                    placeholder="6 C"
+                    {...register("course")}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="w-full justify-center mt-10">
-              <Button type="submit" variant="neutral">
-                Registrarse
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="w-full justify-center mt-10">
+                <Button type="submit" variant="neutral">
+                  Registrarse
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
