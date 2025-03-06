@@ -76,7 +76,7 @@ const Page = () => {
       setError("Problema de conexión. Inténtalo de nuevo.");
       setShowAlert(true);
       setLoading(false);
-      router.push("/encuesta");
+      router.push("/inicio");
     }
   };
 
