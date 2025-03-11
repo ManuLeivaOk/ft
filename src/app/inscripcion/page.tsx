@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -18,6 +18,14 @@ import { Label } from "../../components/ui/label";
 import ErrorDialog from "../../components/ui/errorDialog";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import RetroSpinner from "@/components/ui/loader";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type FormData = {
   name: string;
@@ -25,7 +33,8 @@ type FormData = {
   email: string;
   age: number;
   school: string;
-  course: string;
+  instagram: string;
+  nacimiento: Date;
 };
 
 const schema = yup.object().shape({
@@ -42,10 +51,11 @@ const schema = yup.object().shape({
     .max(99, "Debe ser menor a 99 años")
     .required("La edad es obligatoria"),
   school: yup.string().required("El colegio es obligatorio"),
-  course: yup.string().required("El curso y división son obligatorios"),
+  instagram: yup.string().required("El instagram es obligatorio"),
+  nacimiento: yup.date().required("Fecha de cumpleaños es obligatoria"),
 });
 
-const Page = () => {  
+const Page = () => {
   const router = useRouter();
 
   const {
@@ -54,13 +64,23 @@ const Page = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      nacimiento: new Date(),
+    },
   });
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<number | null>(null);
   const [errorsList, setErrorsList] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [viewPopup, setViewPopup] = useState(false);
+
+  useEffect(() => setStep(1), []);
 
   const onSubmit = (data: FormData) => {
+    setLoading(true);
     console.log("Datos enviados:", data);
-    router.push("/login");
+    setLoading(false);
+    setViewPopup(true);
+    /* router.push("/login"); */
   };
 
   const handleErrors = () => {
@@ -90,15 +110,32 @@ const Page = () => {
       {step === 1 ? (
         <div className="px-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Hola, ¡bienvenido! </h2>
-          <Image alt="Hello!" src="/bienvenida.jpg" width={300} height={200} className="mx-auto rounded-xl mb-4 shadow w-full opacity-95" />
+          <Image
+            alt="Hello!"
+            src="/bienvenida.jpg"
+            width={300}
+            height={200}
+            className="mx-auto rounded-xl mb-4 shadow w-full opacity-95"
+          />
           <p className="mb-4">
             Para poder registrarte, por favor completa el siguiente formulario
           </p>
-          <Button className="mb-10" onClick={() => setStep(2)}>Comenzar</Button>
+          <Button className="mb-10" onClick={() => setStep(2)}>
+            Comenzar
+          </Button>
 
-          <p className="mb-4">
-            Si ya tenés una cuenta, podés <Badge className="mb-2" onClick={() => {router.push('/login')}}>iniciar sesión</Badge>
-          </p>
+          <div>
+            Si ya tenés una cuenta, podés
+            <span className=" ml-2 mb-2">
+              <Badge
+                onClick={() => {
+                  router.push("/login");
+                }}
+              >
+                iniciar sesión
+              </Badge>
+            </span>
+          </div>
         </div>
       ) : (
         <Card className="w-[350px]">
@@ -158,22 +195,59 @@ const Page = () => {
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="course">Curso y división</Label>
+                  <Label htmlFor="instagram">Instagram</Label>
+                  <Input
+                    id="instagram"
+                    placeholder="@juanperez"
+                    {...register("instagram")}
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="course">Fecha de cumpleaños</Label>
                   <Input
                     id="course"
+                    type="date"
                     placeholder="6 C"
-                    {...register("course")}
+                    {...register("nacimiento")}
                   />
                 </div>
               </div>
               <div className="w-full justify-center mt-10">
                 <Button type="submit" variant="neutral">
-                  Registrarse
+                  {loading ? <RetroSpinner /> : "Registrarse"}
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
+      )}
+      {viewPopup && (
+        <Dialog open={viewPopup} onOpenChange={setViewPopup}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Registro exitoso</DialogTitle>
+              <DialogDescription>
+                Tu cuenta fue creada con éxito.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <p className="text-2xl font-bold text-center">
+                ¡Información importante!
+              </p>
+              <p>
+                El día del evento, tenés que llevar algún vaso/taza/termo para
+                poder tomar bebidas. ¡También está permitido llevar mate!
+              </p>
+            </div>
+            <Button
+              onClick={() => router.push("/login")}
+              className="w-[100px] mx-auto"
+            >
+              Finalizar
+            </Button>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
