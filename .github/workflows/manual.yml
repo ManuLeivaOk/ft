@@ -41,5 +41,5 @@ jobs:
             # Construir el proyecto Next.js
             npm run build
             # Iniciar la aplicación en modo producción con el puerto 3001
-            pm2 restart all || pm2 start npm --name next-app -- start -- -p 3001
+            pm2 restart next-app || pm2 start "npm run start -- -p 3001" --name next-app
           EOF
