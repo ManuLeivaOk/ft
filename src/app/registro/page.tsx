@@ -1,62 +1,61 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useRouter } from "next/navigation";
+'use client'
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { useRouter } from 'next/navigation'
+import { AxiosError } from 'axios'
 
-import { Button } from "../../components/ui/button";
+import { Button } from '../../components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import ErrorDialog from "../../components/ui/errorDialog";
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
-import RetroSpinner from "@/components/ui/loader";
+} from '@/components/ui/card'
+import { Input } from '../../components/ui/input'
+import { Label } from '../../components/ui/label'
+import ErrorDialog from '../../components/ui/errorDialog'
+import RetroSpinner from '@/components/ui/loader'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-
-type FormData = {
-  name: string;
-  lastName: string;
-  email: string;
-  age: number;
-  school: string;
-  instagram: string;
-  nacimiento: Date;
-};
+} from '@/components/ui/dialog'
+import registerUser from '@/services/user.register'
+import { FormData } from '../types/register.user.dto'
+import StepOne from '@/components/registro/StepOne'
 
 const schema = yup.object().shape({
-  name: yup.string().required("El nombre es obligatorio"),
-  lastName: yup.string().required("El apellido es obligatorio"),
+  name: yup.string().required('El nombre es obligatorio'),
+  lastName: yup.string().required('El apellido es obligatorio'),
   email: yup
     .string()
-    .email("Debe ser un email válido")
-    .required("El email es obligatorio"),
+    .email('Debe ser un email válido')
+    .required('El email es obligatorio'),
   age: yup
     .number()
-    .typeError("Debe ser un número")
-    .min(10, "Debe ser mayor a 10 años")
-    .max(99, "Debe ser menor a 99 años")
-    .required("La edad es obligatoria"),
-  school: yup.string().required("El colegio es obligatorio"),
-  instagram: yup.string().required("El instagram es obligatorio"),
-  nacimiento: yup.date().required("Fecha de cumpleaños es obligatoria"),
-});
+    .typeError('Debe ser un número')
+    .min(10, 'Debe ser mayor a 10 años')
+    .max(99, 'Debe ser menor a 99 años')
+    .required('La edad es obligatoria'),
+  school: yup.string().required('El colegio es obligatorio'),
+  instagram: yup.string().required('El instagram es obligatorio'),
+  birthday: yup.date().required('Fecha de cumpleaños es obligatoria'),
+  documentNumber: yup
+    .string()
+    .required('El número de documento es obligatorio'),
+  password: yup
+    .string()
+    .required('La contraseña es obligatoria')
+    .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+})
 
 const Page = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const {
     register,
@@ -65,80 +64,68 @@ const Page = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      nacimiento: new Date(),
+      birthday: new Date(),
     },
-  });
-  const [step, setStep] = useState<number | null>(null);
-  const [errorsList, setErrorsList] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [viewPopup, setViewPopup] = useState(false);
+  })
+  const [step, setStep] = useState<number | null>(1)
+  const [errorsList, setErrorsList] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const [viewPopup, setViewPopup] = useState(false)
 
-  useEffect(() => setStep(1), []);
+  useEffect(() => setStep(1), [])
 
-  const onSubmit = (data: FormData) => {
-    setLoading(true);
-    console.log("Datos enviados:", data);
-    setLoading(false);
-    setViewPopup(true);
-    /* router.push("/login"); */
-  };
+  const onSubmit = async (data: FormData) => {
+    setLoading(true)
+    console.log('Datos enviados:', data)
+    try {
+      const response = await registerUser(data)
+      console.log('response', response)
+      setLoading(false)
+      setViewPopup(true)
+    } catch (err) {
+      setLoading(false)
+
+      const error = err as AxiosError<{ message?: string | string[] }>
+
+      if (error.response?.data?.message) {
+        const firstErrorMessage = Array.isArray(error.response.data.message)
+          ? error.response.data.message[0]
+          : error.response.data.message
+
+        setErrorsList([firstErrorMessage])
+      } else {
+        setErrorsList(['Error al registrar usuario'])
+      }
+    }
+  }
 
   const handleErrors = () => {
     const firstErrorMessage = Object.values(errors)
       .map((error) => error.message)
-      .find((message): message is string => message !== undefined); // Tomar solo el primer error
+      .find((message): message is string => message !== undefined)
 
     if (firstErrorMessage) {
-      setErrorsList([firstErrorMessage]);
+      setErrorsList([firstErrorMessage])
 
-      // Auto ocultar después de 5 segundos
       setTimeout(() => {
-        setErrorsList([]);
-      }, 5000);
+        setErrorsList([])
+      }, 5000)
     }
-  };
+  }
 
   return (
-    <div className="w-full h-screen flex justify-center items-center">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center overflow-y-auto">
       {errorsList.length > 0 && (
         <ErrorDialog
-          message={errorsList.join(" • ")}
+          message={errorsList.join(' • ')}
           onClose={() => setErrorsList([])}
           color="bg-[#ff6b6b]"
         />
       )}
       {step === 1 ? (
-        <div className="px-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Hola, ¡bienvenido! </h2>
-          <Image
-            alt="Hello!"
-            src="/bienvenida.jpg"
-            width={300}
-            height={200}
-            className="mx-auto rounded-xl mb-4 shadow w-full opacity-95"
-          />
-          <p className="mb-4">
-            Para poder registrarte, por favor completa el siguiente formulario
-          </p>
-          <Button className="mb-10" onClick={() => setStep(2)}>
-            Comenzar
-          </Button>
-
-          <div>
-            Si ya tenés una cuenta, podés
-            <span className=" ml-2 mb-2">
-              <Badge
-                onClick={() => {
-                  router.push("/login");
-                }}
-              >
-                iniciar sesión
-              </Badge>
-            </span>
-          </div>
-        </div>
+        <StepOne setStep={setStep} />
       ) : (
-        <Card className="w-[350px]">
+        <Card className="w-[350px] my-12 h-auto">
           <CardHeader>
             <CardTitle>Formulario de registro</CardTitle>
             <CardDescription>Registro de alumnos.</CardDescription>
@@ -152,7 +139,7 @@ const Page = () => {
                     id="name"
                     placeholder="Juan"
                     type="text"
-                    {...register("name")}
+                    {...register('name')}
                   />
                 </div>
                 <div className="flex flex-col space-y-1.5">
@@ -161,7 +148,7 @@ const Page = () => {
                     id="lastName"
                     placeholder="Perez"
                     type="text"
-                    {...register("lastName")}
+                    {...register('lastName')}
                   />
                 </div>
 
@@ -171,7 +158,27 @@ const Page = () => {
                     id="email"
                     placeholder="juan.perez@email.com"
                     type="email"
-                    {...register("email")}
+                    {...register('email')}
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="email">Número de documento</Label>
+                  <Input
+                    id="documentNumber"
+                    placeholder="44444444"
+                    type="documentNumber"
+                    {...register('documentNumber')}
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="password">Contraseña</Label>
+                  <Input
+                    id="password"
+                    placeholder="********"
+                    type="password"
+                    {...register('password')}
                   />
                 </div>
 
@@ -181,7 +188,7 @@ const Page = () => {
                     id="age"
                     placeholder="17"
                     type="number"
-                    {...register("age")}
+                    {...register('age')}
                   />
                 </div>
 
@@ -190,7 +197,7 @@ const Page = () => {
                   <Input
                     id="school"
                     placeholder="General José María Paz"
-                    {...register("school")}
+                    {...register('school')}
                   />
                 </div>
 
@@ -198,8 +205,8 @@ const Page = () => {
                   <Label htmlFor="instagram">Instagram</Label>
                   <Input
                     id="instagram"
-                    placeholder="@juanperez"
-                    {...register("instagram")}
+                    placeholder="juanperez"
+                    {...register('instagram')}
                   />
                 </div>
 
@@ -209,13 +216,13 @@ const Page = () => {
                     id="course"
                     type="date"
                     placeholder="6 C"
-                    {...register("nacimiento")}
+                    {...register('birthday')}
                   />
                 </div>
               </div>
               <div className="w-full justify-center mt-10">
                 <Button type="submit" variant="neutral">
-                  {loading ? <RetroSpinner /> : "Registrarse"}
+                  {loading ? <RetroSpinner /> : 'Registrarse'}
                 </Button>
               </div>
             </form>
@@ -241,7 +248,7 @@ const Page = () => {
               </p>
             </div>
             <Button
-              onClick={() => router.push("/login")}
+              onClick={() => router.push('/login')}
               className="w-[100px] mx-auto"
             >
               Finalizar
@@ -250,7 +257,7 @@ const Page = () => {
         </Dialog>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page
