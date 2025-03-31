@@ -15,11 +15,14 @@ import { Button } from '../../components/ui/button'
 import RetroSpinner from '../../components/ui/loader'
 import ErrorAlert from '@/components/ui/errorDialog'
 import axios from 'axios'
+import { useSession } from '../../context/SessionContext'
 
 const Page = () => {
+  const { login } = useSession()
+
   const router = useRouter()
-  const [documentNumber, setDocumentNumber] = useState('')
-  const [password, setPassword] = useState('')
+  const [documentNumber, setDocumentNumber] = useState('44444444')
+  const [password, setPassword] = useState('123456')
   const [error, setError] = useState<string>('')
   const [showAlert, setShowAlert] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -66,6 +69,8 @@ const Page = () => {
         return
       }
 
+      login(response.data.user)
+      localStorage.setItem('session', JSON.stringify(response.data.user))
       localStorage.setItem('token', JSON.stringify(response.data.access_token))
       setLoading(false)
       router.push('/inicio')

@@ -6,9 +6,15 @@ interface Props {
   message: string
   onClose: () => void
   color: string
+  textColor?: string
 }
 
-const ErrorAlert = ({ message, onClose, color }: Props) => {
+const ErrorAlert = ({
+  message,
+  onClose,
+  color,
+  textColor = 'white',
+}: Props) => {
   const [isFadingOut, setIsFadingOut] = useState(false)
 
   useEffect(() => {
@@ -33,8 +39,8 @@ const ErrorAlert = ({ message, onClose, color }: Props) => {
       }`}
     >
       <div className="flex justify-center">
-        <CircleAlert className="mr-5" />
-        <p>{message}</p>
+        <CircleAlert className={`mr-2 ${textColor}`} />
+        <p className={`${textColor}`}>{message}</p>
       </div>
     </div>
   )
