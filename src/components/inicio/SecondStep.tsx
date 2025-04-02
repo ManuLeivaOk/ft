@@ -15,11 +15,15 @@ import {
 import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
-import { useSession } from '../../context/SessionContext'
+import { Session, useSession } from '../../context/SessionContext'
 import ErrorDialog from '../../components/ui/errorDialog'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
-const SecondStep = () => {
+interface Props {
+  login: (user: Session) => void
+}
+
+const SecondStep = ({ login }: Props) => {
   const { session } = useSession()
   const [loading, setLoading] = useState(true)
   const [talks, setTalks] = React.useState<GetTalks[]>([])
@@ -104,6 +108,28 @@ const SecondStep = () => {
     }
   }
 
+  const update = async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:3000/users/updateSession',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      )
+      getQuestionsByUser()
+      setLoading(false)
+      login(response.data)
+      localStorage.setItem('session', JSON.stringify(response.data))
+      setSelectedSpeaker(null)
+    } catch (e) {
+      console.log(e)
+      setLoading(false)
+    }
+  }
+
   return (
     <>
       {loading ? (
@@ -127,7 +153,7 @@ const SecondStep = () => {
             alt="preguntas"
             width={500}
             height={500}
-            className="w-full rounded-lg my-4"
+            className="w-full rounded-lg my-4 shadow-lg"
           />
           {/* <p className="mt-5 text-center">
             Selecciona un orador y dejale tu pregunta.{' '}
@@ -198,6 +224,8 @@ const SecondStep = () => {
               </div>
             </CardContent>
           </Card>
+
+          <Button onClick={update}>Actualizar sessión</Button>
         </div>
       )}
     </>

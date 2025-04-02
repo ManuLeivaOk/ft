@@ -4,6 +4,8 @@ import { useSession } from '../../context/SessionContext'
 import FirstStep from '../../components/inicio/FirstStep'
 import RetroSpinner from '../../components/ui/loader'
 import SecondStep from '../../components/inicio/SecondStep'
+import ThirdStep from '../../components/inicio/ThirdStep'
+import FourthState from '../../components/inicio/FourthState'
 
 const Page = () => {
   const { session, login } = useSession()
@@ -30,7 +32,9 @@ const Page = () => {
       {step === 'firstStep' && type === '1' && (
         <FirstStep login={login} session={session} setStep={setStep} />
       )}
-      {step === 'secondStep' && <SecondStep />}
+      {step === 'secondStep' && <SecondStep login={login} />}
+      {step === 'thirdStep' && <ThirdStep session={session} login={login} />}
+      {step === 'fourthStep' && <FourthState session={session} />}
     </div>
   )
 }
