@@ -29,18 +29,6 @@ import registerUser from '@/services/user.register'
 import { FormData } from '../types/register.user.dto'
 import StepOne from '@/components/registro/StepOne'
 
-const testUserData: FormData = {
-  name: 'Juan',
-  lastName: 'Pérez',
-  email: 'juan.perez@email.com',
-  age: 17,
-  school: 'General José María Paz',
-  instagram: 'juanperez',
-  birthday: new Date('2006-05-15'),
-  documentNumber: '44444444',
-  password: '123456',
-}
-
 const schema = yup.object().shape({
   name: yup.string().required('El nombre es obligatorio'),
   lastName: yup.string().required('El apellido es obligatorio'),
@@ -75,7 +63,9 @@ const Page = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: testUserData,
+    defaultValues: {
+      birthday: new Date(),
+    },
   })
   const [step, setStep] = useState<number | null>(1)
   const [errorsList, setErrorsList] = useState<string[]>([])
@@ -89,7 +79,7 @@ const Page = () => {
     console.log('Datos enviados:', data)
 
     try {
-      const response = await registerUser(testUserData)
+      const response = await registerUser(data)
       console.log('response', response)
       setLoading(false)
       setViewPopup(true)
