@@ -54,6 +54,24 @@ const schema = yup.object().shape({
     .min(6, 'La contraseña debe tener al menos 6 caracteres'),
 })
 
+const colorMap: Record<string, string> = {
+  Naranja: 'bg-orange-400  border-orange-200 sm:max-w-[425px]',
+  Azul: 'bg-blue-400 text-white-900 border-blue-200 sm:max-w-[425px]',
+  Rosa: 'bg-pink-400 border-pink-200 sm:max-w-[425px]',
+  Verde: 'bg-green-400 border-green-200 sm:max-w-[425px]',
+  Rojo: 'bg-red-400 border-red-200 sm:max-w-[425px]',
+  Amarillo: 'bg-yellow-400 border-red-200 sm:max-w-[425px]',
+  Morado: 'bg-purple-400 text-white-900 border-red-200 sm:max-w-[425px]',
+  Gris: 'bg-gray-400 text-white-900 border-red-200 sm:max-w-[425px]',
+  Negro: 'bg-stone-900 text-white-900 border-red-200 sm:max-w-[425px]',
+  Blanco: 'bg-neutral-50 text-black-900 border-red-200 sm:max-w-[425px]',
+  default: 'bg-gray-400 text-white-900 border-gray-200 sm:max-w-[425px]',
+}
+
+export const getColorByTeam = (team: string) => {
+  return colorMap[team] || colorMap.default
+}
+
 const Page = () => {
   const router = useRouter()
 
@@ -71,6 +89,8 @@ const Page = () => {
   const [errorsList, setErrorsList] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [viewPopup, setViewPopup] = useState(false)
+  const [viewPopupTeamColor, setViewPopupTeamColor] = useState(false)
+  const [userTeamColor, setUserTeamColor] = useState('')
 
   useEffect(() => setStep(1), [])
 
@@ -80,7 +100,8 @@ const Page = () => {
 
     try {
       const response = await registerUser(data)
-      console.log('response', response)
+
+      setUserTeamColor(response.colour)
       setLoading(false)
       setViewPopup(true)
     } catch (err) {
@@ -249,10 +270,37 @@ const Page = () => {
               </p>
             </div>
             <Button
+              onClick={() => {
+                setViewPopup(false)
+                setViewPopupTeamColor(true)
+              }}
+              className="w-[100px] mx-auto"
+            >
+              Aceptar
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
+      {viewPopupTeamColor && (
+        <Dialog open={viewPopupTeamColor} onOpenChange={setViewPopupTeamColor}>
+          <DialogContent className={getColorByTeam(userTeamColor)}>
+            <DialogHeader>
+              <DialogTitle>Este es tu equipo</DialogTitle>
+              <DialogDescription>
+                Tu cuenta fue creada con éxito.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <p className="text-2xl font-bold text-center">
+                ¡Información importante!
+              </p>
+              <p>Se te asigno el equipo {userTeamColor}</p>
+            </div>
+            <Button
               onClick={() => router.push('/login')}
               className="w-[100px] mx-auto"
             >
-              Finalizar
+              Okey!
             </Button>
           </DialogContent>
         </Dialog>

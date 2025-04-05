@@ -6,6 +6,7 @@ import RetroSpinner from '../../components/ui/loader'
 import SecondStep from '../../components/inicio/SecondStep'
 import ThirdStep from '../../components/inicio/ThirdStep'
 import FourthState from '../../components/inicio/FourthState'
+import SpeakerPage from '../../components/inicio/SpeakerPage'
 
 const Page = () => {
   const { session, login } = useSession()
@@ -31,6 +32,9 @@ const Page = () => {
     <div className="p-8">
       {step === 'firstStep' && type === '1' && (
         <FirstStep login={login} session={session} setStep={setStep} />
+      )}
+      {type === '2' && (
+        <SpeakerPage />
       )}
       {step === 'secondStep' && <SecondStep login={login} />}
       {step === 'thirdStep' && <ThirdStep session={session} login={login} />}

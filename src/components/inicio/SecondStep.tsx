@@ -18,6 +18,7 @@ import { Button } from '../ui/button'
 import { Session, useSession } from '../../context/SessionContext'
 import ErrorDialog from '../../components/ui/errorDialog'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { getColorByTeam } from '../../app/registro/page'
 
 interface Props {
   login: (user: Session) => void
@@ -161,12 +162,19 @@ const SecondStep = ({ login }: Props) => {
               La pregunta se registra a nombre de tu usuario.
             </span>
           </p> */}
+          <div className='flex justify-between'>
+            <div className="w-full flex items-center">
+              <p className="mr-2">Equipo: </p>
+              <Button className={`${getColorByTeam(session?.colour!)}, rounded-button`} variant={'noShadow'}>
+              </Button>
+            </div>
 
-          <div className="w-full flex items-center justify-end mt-4">
-            <p className="mr-2">Preguntas realizadas:</p>
-            <Button className="rounded-full" variant={'noShadow'}>
-              {questionsByUser.length}
-            </Button>
+            <div className="w-full flex items-center justify-end">
+              <p className="mr-2">Preguntas realizadas:</p>
+              <Button className="rounded-full" variant={'noShadow'}>
+                {questionsByUser.length}
+              </Button>
+            </div>
           </div>
 
           <Card className="mt-4">
@@ -225,7 +233,7 @@ const SecondStep = ({ login }: Props) => {
             </CardContent>
           </Card>
 
-          <Button onClick={update}>Actualizar sessión</Button>
+          <Button className='mt-5' onClick={update}>Actualizar sesión</Button>
         </div>
       )}
     </>

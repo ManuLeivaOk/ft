@@ -29,7 +29,7 @@ const StepOne = ({ setStep }: Props) => {
 
       <div>
         Si ya tenés una cuenta, podés{' '}
-        <span className="ml-2 mb-2">
+        <span className="ml-2 mb-2 cursor-pointer">
           <Badge
             onClick={() => {
               router.push('/login')
