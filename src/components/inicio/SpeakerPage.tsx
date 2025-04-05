@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "@radix-ui/react-label"
 import { Textarea } from "../ui/textarea"
 import { Button } from "../ui/button"
@@ -99,8 +99,13 @@ const SpeakerPage = () => {
               questions.map((question) => (
                 <div key={question.id} className="mt-4">
                   <Card>
-                    <CardContent className="bg-white flex justify-center aling-items-center">
-                      {question.question}
+                    <div className="bg-white flex text-gray-400 text-xs p-2">
+                      {question.user.name} {question.user.lastName}
+                    </div>
+                    <CardContent className="bg-white flex justify-center content-center">
+                      <div className="text-center mt-4">
+                        {question.question}
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -111,7 +116,10 @@ const SpeakerPage = () => {
           </div>
         </CardContent>
       </Card>
-      <Button className='mt-5' onClick={() => getQuestionsByTalkId(selectedSpeaker!)}>Actualizar preguntas</Button>
+      <div>
+
+        <Button className='mt-5' onClick={() => getQuestionsByTalkId(selectedSpeaker!)}>Actualizar preguntas</Button>
+      </div>
 
     </div>
   )
