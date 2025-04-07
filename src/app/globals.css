@@ -142,3 +142,9 @@ body {
 .animate-fadeOut {
   animation: fadeOut 1s ease-in-out 1s 4s forwards; /* Espera 4 segundos antes de ejecutar fadeOut */
 }
+
+.rounded-button{
+  border-radius: 100px;
+  width: 40px;
+  border: solid #000 2px;
+}

@@ -1,0 +1,45 @@
+name: Deploy Next.js App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Clonar el repositorio
+        uses: actions/checkout@v4
+
+      - name: 🔄 Instalar sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: 🔄 Copiar archivos al servidor
+        run: |
+          sshpass -p '9d#N2@g02cmE' scp -P 14932 -r -o StrictHostKeyChecking=no * root@45.236.131.22:/root/nextapp
+
+      - name: 🚀 Instalar dependencias y reiniciar app
+        run: |
+          sshpass -p '9d#N2@g02cmE' ssh -p 14932 -o StrictHostKeyChecking=no root@45.236.131.22 <<EOF
+            # Cargar el entorno de Node.js y asegurarse de que esté en el PATH
+            export PATH=$PATH:/root/.nvm/versions/node/v22.14.0/bin
+            # Verificar si npm y pm2 están instalados, y si no, instalar pm2
+            if ! command -v npm &> /dev/null; then
+              echo "npm no está instalado, instalando..."
+              apt-get install -y npm
+            fi
+            if ! command -v pm2 &> /dev/null; then
+              echo "pm2 no está instalado, instalando..."
+              npm install -g pm2
+            fi
+            # Cambiar al directorio de la app
+            cd /root/nextapp
+            # Instalar dependencias
+            npm install
+            # Construir el proyecto Next.js
+            npm run build
+            # Iniciar la aplicación en modo producción con el puerto 3001
+            pm2 restart next-app || pm2 start "npm run start -- -p 3001" --name next-app
+          EOF

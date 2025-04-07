@@ -1,6 +1,6 @@
-"use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+'use client'
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -8,77 +8,86 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Label } from "../../components/ui/label";
-import { Input } from "../../components/ui/input";
-import { Button } from "../../components/ui/button";
-import RetroSpinner from "../../components/ui/loader";
-import ErrorAlert from "@/components/ui/errorDialog";
+} from '../../components/ui/card'
+import { Label } from '../../components/ui/label'
+import { Input } from '../../components/ui/input'
+import { Button } from '../../components/ui/button'
+import RetroSpinner from '../../components/ui/loader'
+import ErrorAlert from '@/components/ui/errorDialog'
+import axios from 'axios'
+import { useSession } from '../../context/SessionContext'
 
 const Page = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [error, setError] = useState<string>("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { login } = useSession()
 
-  const validateEmail = (email: string) => {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return regex.test(email);
-  };
+  const router = useRouter()
+  const [documentNumber, setDocumentNumber] = useState('44444444')
+  const [password, setPassword] = useState('123456')
+  const [error, setError] = useState<string>('')
+  const [showAlert, setShowAlert] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     // Validaciones
-    if (!email || !validateEmail(email)) {
-      setError("Por favor ingresa un email válido.");
-      setShowAlert(true);
-      setLoading(false);
-      return;
+    if (!documentNumber) {
+      setError('Por favor ingresa un documento válido.')
+      setShowAlert(true)
+      setLoading(false)
+      return
     }
 
-    if (!pass || pass.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
-      setShowAlert(true);
-      setLoading(false);
-      return;
+    if (!password || password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.')
+      setShowAlert(true)
+      setLoading(false)
+      return
     }
 
-    setError("");
-    setShowAlert(false);
+    setError('')
+    setShowAlert(false)
 
-    const credentials = { email, pass };
+    const credentials = { documentNumber, password }
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
+      const response = await axios.post(
+        'http://localhost:3000/auth/login',
+        credentials,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.msg);
-        setShowAlert(true);
-        setLoading(false);
-        return;
+      if (response.status !== 201) {
+        setError(response.data.msg ?? 'Error desconocido')
+        setShowAlert(true)
+        setLoading(false)
+        return
       }
-      console.log("Login exitoso");
-      setLoading(false);
-      router.push("/inicio");
+
+      login(response.data.user)
+      localStorage.setItem('session', JSON.stringify(response.data.user))
+      localStorage.setItem('token', JSON.stringify(response.data.access_token))
+      setLoading(false)
+      router.push('/inicio')
     } catch (e) {
-      console.log("e", e);
-      setError("Problema de conexión. Inténtalo de nuevo.");
-      setShowAlert(true);
-      setLoading(false);
-      router.push("/inicio");
+      if (axios.isAxiosError(e)) {
+        if (e.response) {
+          setError(e.response.data.message ?? 'Error desconocido')
+        } else {
+          setError('Problema de conexión. Inténtalo de nuevo.')
+        }
+      } else {
+        setError('Error desconocido. Intenta nuevamente.')
+      }
+      setShowAlert(true)
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="w-full h-screen flex justify-center align-middle items-center">
@@ -93,33 +102,44 @@ const Page = () => {
           <CardContent>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="documentNumber">Número de documento</Label>
                 <Input
-                  type="email"
-                  id="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="documentNumber"
+                  id="documentNumber"
+                  placeholder="Número de documento"
+                  value={documentNumber}
+                  onChange={(e) => setDocumentNumber(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="pass">Contraseña</Label>
+                <Label htmlFor="password">Contraseña</Label>
                 <Input
                   type="password"
-                  id="pass"
+                  id="password"
                   placeholder="Contraseña"
-                  value={pass}
-                  onChange={(e) => setPass(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-center">
             <Button type="submit" variant="neutral" className="w-[90px]">
-              {loading ? <RetroSpinner /> : "Ingresar"}
+              {loading ? <RetroSpinner /> : 'Ingresar'}
             </Button>
           </CardFooter>
         </form>
+        <p className="text-center mb-5">
+          ¿Necesitas{' '}
+          <button
+            onClick={() => {
+              router.push('/registro')
+            }}
+            className="font-bold"
+          >
+            Crear cuenta?
+          </button>
+        </p>
       </Card>
       {showAlert && (
         <ErrorAlert
@@ -129,7 +149,7 @@ const Page = () => {
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

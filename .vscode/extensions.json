@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "johnpapa.nestjs-snippets",
+    "bierner.markdown-preview-github-styles"
+  ]
+}

@@ -1,75 +1,46 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import React from "react";
-import { SendHorizonal } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
+'use client'
+import React, { useEffect } from 'react'
+import { useSession } from '../../context/SessionContext'
+import FirstStep from '../../components/inicio/FirstStep'
+import RetroSpinner from '../../components/ui/loader'
+import SecondStep from '../../components/inicio/SecondStep'
+import ThirdStep from '../../components/inicio/ThirdStep'
+import FourthState from '../../components/inicio/FourthState'
+import SpeakerPage from '../../components/inicio/SpeakerPage'
 
 const Page = () => {
+  const { session, login } = useSession()
+  const [step, setStep] = React.useState<string>('firstStep')
+  const [type, setType] = React.useState<string>()
+
+  useEffect(() => {
+    if (session) {
+      setStep(session.state)
+      setType(session.type)
+    }
+  }, [session])
+
+  if (!session) {
+    return (
+      <div className="w-full flex justify-center mt-10">
+        <RetroSpinner />
+      </div>
+    )
+  }
+
   return (
     <div className="p-8">
-      <h1 className="font-bold text-2xl text-center">¡Bienvenido al evento!</h1>
-      <Image
-          src={"/home.jpg"}
-          alt="bienvenida"
-          width={200}
-          height={100}
-          className="w-full rounded-2xl opacity-95 mt-4 mb-8"
-        />
-      <div>
-        <Card className="my-5">
-          <CardHeader>
-            <CardTitle>Registro de asistencia</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>
-              Para poder registrar tu asistencia al evento, tenes que ingresar
-              el código que te darán en la entrada y enviarlo
-            </p>
-            <div className="flex flex-col space-y-1.5 mt-8 mb-4">
-              <Label htmlFor="name" className="ml-1">
-                Código
-              </Label>
-              <Input id="name" placeholder="123456" type="text" />
-            </div>
-            <Button variant={"neutral"} className="mt-3">
-              <SendHorizonal size={48} />
-              Enviar
-            </Button>
-          </CardContent>
-        </Card>
-
-        
-
-        {/*         <Card className="my-5">
-          <CardHeader>
-            <CardTitle>Stand 1</CardTitle>
-            <CardDescription>Slogan del stand</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Odit
-              laboriosam modi eos sapiente sint aut consectetur consequuntur
-              ipsa id numquam, tempore atque officia nobis inventore ex! Quidem
-              accusamus cumque animi!
-            </p>
-            <Button
-              variant={"neutral"}
-              className="mt-3"
-              onClick={() => {
-                router.push("/pregunta");
-              }}
-            >
-              <MessageCircleQuestion size={48} />
-              Hacer pregunta
-            </Button>
-          </CardContent>
-        </Card> */}
-      </div>
+      {step === 'firstStep' && type === '1' && (
+        <FirstStep login={login} session={session} setStep={setStep} />
+      )}
+      {type === '2' && (
+        <SpeakerPage />
+      )}
+      {step === 'secondStep' && <SecondStep login={login} />}
+      {step === 'thirdStep' && <ThirdStep session={session} login={login} />}
+      {step === 'fourthStep' && <FourthState session={session} />}
     </div>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page
