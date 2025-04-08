@@ -52,7 +52,7 @@ const SecondStep = ({ login }: Props) => {
   const getTalks = async () => {
     try {
       const response = await axios.get(
-        'http://45.236.131.22:3000/talks-and-questions',
+        'http://localhost:3000/talks-and-questions',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -71,7 +71,13 @@ const SecondStep = ({ login }: Props) => {
   const getQuestionsByUser = async () => {
     try {
       const response = await axios.get(
-        `http://45.236.131.22:3000/talks-and-questions/questionsByUser/${session?.id}`
+        `http://localhost:3000/talks-and-questions/questionsByUser/${session?.id}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
       )
       setQuestionByUser(response.data)
       console.log('r', response)
@@ -89,7 +95,7 @@ const SecondStep = ({ login }: Props) => {
         talkId: selectedSpeaker,
       }
       const response = await axios.post(
-        'http://45.236.131.22:3000/talks-and-questions',
+        'http://localhost:3000/talks-and-questions',
         payload,
         {
           headers: {
@@ -112,7 +118,7 @@ const SecondStep = ({ login }: Props) => {
   const update = async () => {
     try {
       const response = await axios.get(
-        'http://45.236.131.22:3000/users/updateSession',
+        `http://localhost:3000/users/updateSession/${session?.documentNumber}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -120,11 +126,15 @@ const SecondStep = ({ login }: Props) => {
           },
         }
       )
-      getQuestionsByUser()
-      setLoading(false)
-      login(response.data)
-      localStorage.setItem('session', JSON.stringify(response.data))
-      setSelectedSpeaker(null)
+      console.log('response xxxxx', response.data)
+      if (response.data.state === session?.state) {
+        setLoading(false)
+      } else {
+        getQuestionsByUser()
+        login(response.data)
+        localStorage.setItem('session', JSON.stringify(response.data))
+        setSelectedSpeaker(null)
+      }
     } catch (e) {
       console.log(e)
       setLoading(false)
@@ -162,11 +172,15 @@ const SecondStep = ({ login }: Props) => {
               La pregunta se registra a nombre de tu usuario.
             </span>
           </p> */}
-          <div className='flex justify-between'>
+          <div className="flex justify-between">
             <div className="w-full flex items-center">
               <p className="mr-2">Equipo: </p>
-              <Button className={`${getColorByTeam(session?.colour!)}, rounded-button`} variant={'noShadow'}>
-              </Button>
+              <Button
+                className={`${getColorByTeam(
+                  session?.colour!
+                )}, rounded-button`}
+                variant={'noShadow'}
+              ></Button>
             </div>
 
             <div className="w-full flex items-center justify-end">
@@ -233,7 +247,9 @@ const SecondStep = ({ login }: Props) => {
             </CardContent>
           </Card>
 
-          <Button className='mt-5' onClick={update}>Actualizar sesión</Button>
+          <Button className="mt-5" onClick={update}>
+            Actualizar sesión
+          </Button>
         </div>
       )}
     </>
