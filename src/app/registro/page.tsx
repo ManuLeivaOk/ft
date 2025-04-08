@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { useRouter } from 'next/navigation'
@@ -28,6 +28,7 @@ import {
 import registerUser from '@/services/user.register'
 import { FormData } from '../types/register.user.dto'
 import StepOne from '@/components/registro/StepOne'
+import { getColorByTeam } from '../../utils/colors'
 
 const schema = yup.object().shape({
   name: yup.string().required('El nombre es obligatorio'),
@@ -54,24 +55,6 @@ const schema = yup.object().shape({
     .min(6, 'La contraseña debe tener al menos 6 caracteres'),
 })
 
-const colorMap: Record<string, string> = {
-  Naranja: 'bg-orange-400  border-orange-200 sm:max-w-[425px]',
-  Azul: 'bg-blue-400 text-white-900 border-blue-200 sm:max-w-[425px]',
-  Rosa: 'bg-pink-400 border-pink-200 sm:max-w-[425px]',
-  Verde: 'bg-green-400 border-green-200 sm:max-w-[425px]',
-  Rojo: 'bg-red-400 border-red-200 sm:max-w-[425px]',
-  Amarillo: 'bg-yellow-400 border-red-200 sm:max-w-[425px]',
-  Morado: 'bg-purple-400 text-white-900 border-red-200 sm:max-w-[425px]',
-  Gris: 'bg-gray-400 text-white-900 border-red-200 sm:max-w-[425px]',
-  Negro: 'bg-stone-900 text-white-900 border-red-200 sm:max-w-[425px]',
-  Blanco: 'bg-neutral-50 text-black-900 border-red-200 sm:max-w-[425px]',
-  default: 'bg-gray-400 text-white-900 border-gray-200 sm:max-w-[425px]',
-}
-
-export const getColorByTeam = (team: string) => {
-  return colorMap[team] || colorMap.default
-}
-
 const Page = () => {
   const router = useRouter()
 
@@ -94,7 +77,7 @@ const Page = () => {
 
   useEffect(() => setStep(1), [])
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit: SubmitHandler<any> = async (data) => {
     setLoading(true)
     console.log('Datos enviados:', data)
 

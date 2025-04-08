@@ -38,7 +38,7 @@ const ThirdStep = ({ session, login }: Props) => {
   const getGroups = async () => {
     try {
       const response = await axios.get(
-        'http://localhost:3000/talks-and-questions/groups',
+        'http://45.236.131.22:3000/talks-and-questions/groups',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const ThirdStep = ({ session, login }: Props) => {
   const sendGroup = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/users/selectGroup/${session.documentNumber}/${selectedGroup}`,
+        `http://45.236.131.22:3000/users/selectGroup/${session.documentNumber}/${selectedGroup}`,
         {
           headers: {
             'Content-Type': 'application/json',

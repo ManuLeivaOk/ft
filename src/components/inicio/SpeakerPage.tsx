@@ -18,7 +18,7 @@ const SpeakerPage = () => {
   const getTalks = async () => {
     try {
       const response = await axios.get(
-        'http://localhost:3000/talks-and-questions',
+        'http://45.236.131.22:3000/talks-and-questions',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ const SpeakerPage = () => {
   const getQuestionsByTalkId = async (talkId: number) => {
     try {
       const response = await axios.get(
-        'http://localhost:3000/talks-and-questions/questionsByTalk/' + talkId,
+        'http://45.236.131.22:3000/talks-and-questions/questionsByTalk/' + talkId,
         {
           headers: {
             'Content-Type': 'application/json',

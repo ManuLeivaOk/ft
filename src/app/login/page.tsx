@@ -53,7 +53,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/auth/login',
+        'http://45.236.131.22:3000/auth/login',
         credentials,
         {
           headers: {

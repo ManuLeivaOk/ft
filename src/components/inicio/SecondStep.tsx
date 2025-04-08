@@ -18,7 +18,7 @@ import { Button } from '../ui/button'
 import { Session, useSession } from '../../context/SessionContext'
 import ErrorDialog from '../../components/ui/errorDialog'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { getColorByTeam } from '../../app/registro/page'
+import { getColorByTeam } from '../../utils/colors'
 
 interface Props {
   login: (user: Session) => void
@@ -52,7 +52,7 @@ const SecondStep = ({ login }: Props) => {
   const getTalks = async () => {
     try {
       const response = await axios.get(
-        'http://localhost:3000/talks-and-questions',
+        'http://45.236.131.22:3000/talks-and-questions',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const SecondStep = ({ login }: Props) => {
   const getQuestionsByUser = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/talks-and-questions/questionsByUser/${session?.id}`
+        `http://45.236.131.22:3000/talks-and-questions/questionsByUser/${session?.id}`
       )
       setQuestionByUser(response.data)
       console.log('r', response)
@@ -89,7 +89,7 @@ const SecondStep = ({ login }: Props) => {
         talkId: selectedSpeaker,
       }
       const response = await axios.post(
-        'http://localhost:3000/talks-and-questions',
+        'http://45.236.131.22:3000/talks-and-questions',
         payload,
         {
           headers: {
@@ -112,7 +112,7 @@ const SecondStep = ({ login }: Props) => {
   const update = async () => {
     try {
       const response = await axios.get(
-        'http://localhost:3000/users/updateSession',
+        'http://45.236.131.22:3000/users/updateSession',
         {
           headers: {
             'Content-Type': 'application/json',

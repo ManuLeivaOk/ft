@@ -35,7 +35,7 @@ const FirstStep = ({ login, session, setStep }: Props) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/users/changeFirstState/${code}/${session.documentNumber}`,
+        `http://45.236.131.22:3000/users/changeFirstState/${code}/${session.documentNumber}`,
         {
           headers: {
             'Content-Type': 'application/json',
