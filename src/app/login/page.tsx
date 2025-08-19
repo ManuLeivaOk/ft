@@ -16,6 +16,7 @@ import RetroSpinner from '../../components/ui/loader'
 import ErrorAlert from '@/components/ui/errorDialog'
 import axios from 'axios'
 import { useSession } from '../../context/SessionContext'
+import { urls } from '../../config/config'
 
 const Page = () => {
   const { login } = useSession()
@@ -53,7 +54,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        'http://45.236.131.22:3000/auth/login',
+        `${urls.apiUrl}auth/login`,
         credentials,
         {
           headers: {
@@ -71,7 +72,7 @@ const Page = () => {
 
       login(response.data.user)
       localStorage.setItem('session', JSON.stringify(response.data.user))
-      localStorage.setItem('token', JSON.stringify(response.data.access_token))
+      localStorage.setItem('token', response.data.access_token)
       setLoading(false)
       router.push('/inicio')
     } catch (e) {

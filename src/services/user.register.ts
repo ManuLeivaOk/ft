@@ -1,15 +1,19 @@
-import { FormData } from "@/app/types/register.user.dto";
-import { urls } from "@/config/config";
-import axios from "axios";
+import { FormData } from '@/app/types/register.user.dto'
+import { urls } from '@/config/config'
+import axios from 'axios'
 
 const registerUser = async (payload: FormData) => {
+  console.log('1')
   try {
-    const response = await axios.post(`${urls.apiUrl}users/register`, payload);
-    return response.data;
-  } catch (error) {
-    console.error("Error al registrar usuario:", error);
-    throw error;
-  }
-};
+    console.log('2')
+    const url = urls.apiUrl
 
-export default registerUser;
+    const response = await axios.post(`${url}users/register`, payload)
+    return response.data
+  } catch (error) {
+    console.error('Error al registrar usuario:', error)
+    throw error
+  }
+}
+
+export default registerUser

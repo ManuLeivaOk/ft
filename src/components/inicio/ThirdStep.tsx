@@ -14,6 +14,7 @@ import { Button } from '../ui/button'
 import RetroSpinner from '../ui/loader'
 import axios from 'axios'
 import { Session } from '../../context/SessionContext'
+import { urls } from '../../config/config'
 
 interface Props {
   session: Session
@@ -38,7 +39,7 @@ const ThirdStep = ({ session, login }: Props) => {
   const getGroups = async () => {
     try {
       const response = await axios.get(
-        'http://45.236.131.22:3000/talks-and-questions/groups',
+        `${urls.apiUrl}talks-and-questions/groups`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ const ThirdStep = ({ session, login }: Props) => {
   const sendGroup = async () => {
     try {
       const response = await axios.get(
-        `http://45.236.131.22:3000/users/selectGroup/${session.documentNumber}/${selectedGroup}`,
+        `${urls.apiUrl}users/selectGroup/${session.documentNumber}/${selectedGroup}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ const ThirdStep = ({ session, login }: Props) => {
           {' '}
           <div>
             <h2 className="text-2xl text-center font-bold">
-              ¡Llegando al final!
+              ¡Llegando al final del evento volvé a abrir la app!
             </h2>
             <Image
               src={'/choose.jpg'}

@@ -3,7 +3,6 @@ import React, { useEffect } from 'react'
 import { useSession } from '../../context/SessionContext'
 import FirstStep from '../../components/inicio/FirstStep'
 import RetroSpinner from '../../components/ui/loader'
-import SecondStep from '../../components/inicio/SecondStep'
 import ThirdStep from '../../components/inicio/ThirdStep'
 import FourthState from '../../components/inicio/FourthState'
 import SpeakerPage from '../../components/inicio/SpeakerPage'
@@ -36,8 +35,7 @@ const Page = () => {
       {type === '2' && (
         <SpeakerPage />
       )}
-      {step === 'secondStep' && <SecondStep login={login} />}
-      {step === 'thirdStep' && <ThirdStep session={session} login={login} />}
+      {step === 'secondStep' && <ThirdStep session={session} login={login} />}
       {step === 'fourthStep' && <FourthState session={session} />}
     </div>
   )

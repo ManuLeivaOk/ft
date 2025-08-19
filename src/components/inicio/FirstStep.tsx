@@ -9,6 +9,7 @@ import RetroSpinner from '../ui/loader'
 import ErrorAlert from '../ui/errorDialog'
 import axios from 'axios'
 import { Session } from '../../context/SessionContext'
+import { urls } from '../../config/config'
 
 interface Props {
   login: (user: Session) => void
@@ -35,7 +36,7 @@ const FirstStep = ({ login, session, setStep }: Props) => {
 
     try {
       const response = await axios.get(
-        `http://45.236.131.22:3000/users/changeFirstState/${code}/${session.documentNumber}`,
+        `${urls.apiUrl}users/changeFirstState/${code}/${session.documentNumber}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -92,7 +93,6 @@ const FirstStep = ({ login, session, setStep }: Props) => {
               <Input
                 id="code"
                 value={code}
-                placeholder="123456"
                 type="text"
                 onChange={handleChange}
               />

@@ -26,9 +26,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import registerUser from '@/services/user.register'
-import { FormData } from '../types/register.user.dto'
 import StepOne from '@/components/registro/StepOne'
-import { getColorByTeam } from '../../utils/colors'
 
 const schema = yup.object().shape({
   name: yup.string().required('El nombre es obligatorio'),
@@ -53,10 +51,18 @@ const schema = yup.object().shape({
     .string()
     .required('La contraseña es obligatoria')
     .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'Las contraseñas no coinciden')
+    .required('Debes confirmar la contraseña'),
 })
 
 const Page = () => {
   const router = useRouter()
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
 
   const {
     register,
@@ -77,12 +83,16 @@ const Page = () => {
 
   useEffect(() => setStep(1), [])
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit: SubmitHandler<any> = async (data) => {
     setLoading(true)
     console.log('Datos enviados:', data)
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword, ...payload } = data
+
     try {
-      const response = await registerUser(data)
+      const response = await registerUser(payload)
 
       setUserTeamColor(response.colour)
       setLoading(false)
@@ -142,7 +152,6 @@ const Page = () => {
                   <Label htmlFor="name">Nombre</Label>
                   <Input
                     id="name"
-                    placeholder="Juan"
                     type="text"
                     {...register('name')}
                   />
@@ -151,7 +160,6 @@ const Page = () => {
                   <Label htmlFor="lastName">Apellido</Label>
                   <Input
                     id="lastName"
-                    placeholder="Perez"
                     type="text"
                     {...register('lastName')}
                   />
@@ -161,7 +169,6 @@ const Page = () => {
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
-                    placeholder="juan.perez@email.com"
                     type="email"
                     {...register('email')}
                   />
@@ -171,27 +178,52 @@ const Page = () => {
                   <Label htmlFor="email">Número de documento</Label>
                   <Input
                     id="documentNumber"
-                    placeholder="44444444"
                     type="documentNumber"
                     {...register('documentNumber')}
                   />
                 </div>
-
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="password">Contraseña</Label>
-                  <Input
-                    id="password"
-                    placeholder="********"
-                    type="password"
-                    {...register('password')}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      {...register('password')}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute inset-y-0 right-2 flex items-center text-sm text-gray-600"
+                    >
+                      {showPassword ? '🙊' : '🙈'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="confirmPassword">Repetir Contraseña</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      {...register('confirmPassword')}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="absolute inset-y-0 right-2 flex items-center text-sm text-gray-600"
+                    >
+                      {showConfirmPassword ? '🙊' : '🙈'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="age">Edad</Label>
                   <Input
                     id="age"
-                    placeholder="17"
                     type="number"
                     {...register('age')}
                   />
@@ -201,7 +233,6 @@ const Page = () => {
                   <Label htmlFor="school">Colegio</Label>
                   <Input
                     id="school"
-                    placeholder="General José María Paz"
                     {...register('school')}
                   />
                 </div>
@@ -210,7 +241,6 @@ const Page = () => {
                   <Label htmlFor="instagram">Instagram</Label>
                   <Input
                     id="instagram"
-                    placeholder="juanperez"
                     {...register('instagram')}
                   />
                 </div>
@@ -220,7 +250,6 @@ const Page = () => {
                   <Input
                     id="course"
                     type="date"
-                    placeholder="6 C"
                     {...register('birthday')}
                   />
                 </div>
@@ -247,7 +276,7 @@ const Page = () => {
               <p className="text-2xl font-bold text-center">
                 ¡Información importante!
               </p>
-              <p>
+              <p className='text-center '>
                 El día del evento, tenés que llevar algún vaso/taza/termo para
                 poder tomar bebidas. ¡También está permitido llevar mate!
               </p>
@@ -266,7 +295,7 @@ const Page = () => {
       )}
       {viewPopupTeamColor && (
         <Dialog open={viewPopupTeamColor} onOpenChange={setViewPopupTeamColor}>
-          <DialogContent className={getColorByTeam(userTeamColor)}>
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Este es tu equipo</DialogTitle>
               <DialogDescription>
@@ -277,7 +306,7 @@ const Page = () => {
               <p className="text-2xl font-bold text-center">
                 ¡Información importante!
               </p>
-              <p>Se te asigno el equipo {userTeamColor}</p>
+              <p className='text-center'>Se te asigno el equipo {userTeamColor}</p>
             </div>
             <Button
               onClick={() => router.push('/login')}

@@ -8,7 +8,7 @@ const font = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Rotary event',
+  title: 'Rotary Club',
 }
 
 export default function RootLayout({
